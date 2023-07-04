@@ -8,6 +8,18 @@ type RegisterUserArgs = {
   email: string
 }
 
+type AddStockArgs = {
+  symbol: string
+  nearestFloor: {
+    name: string
+    value: number
+  }
+  nearestCeiling: {
+    name: string
+    value: number
+  }
+}
+
 // todo extract to env var
 const PORT = 3000
 const serverEndpoint = `http://localhost:${PORT}/`
@@ -19,6 +31,17 @@ export const registerUser = async (data: RegisterUserArgs) => {
     console.log("Success: user registered in registerUser")
   } catch (error: any | AxiosError) {
     console.log("Failed to register user")
+    throw new Error("")
+  }
+}
+
+export const addStock = async (data: AddStockArgs) => {
+  try {
+    await postRequest(serverEndpoint + "users/1/stocks", data)
+
+    console.log("Success: stock added in userLanding")
+  } catch (error: any | AxiosError) {
+    console.log("Failed to add stock")
     throw new Error("")
   }
 }

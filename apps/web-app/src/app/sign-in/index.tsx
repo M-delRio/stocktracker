@@ -1,7 +1,5 @@
 import { useState, ChangeEvent } from "react"
 
-import { registerUser } from "../../../../../libs/data-access/http"
-
 const SignIn = () => {
   const [form, setForm] = useState({
     userName: "",
@@ -27,10 +25,12 @@ const SignIn = () => {
     e.preventDefault()
 
     try {
-      await registerUser({
-        userName: form.userName,
-        password: form.password,
-      })
+      // todo
+      // await registerUser({
+      //   userName: form.userName,
+      //   password: form.password,
+      // })
+      // todo redirect to user landing page
     } catch (err) {
       // todo let user know of success or fail
       console.log("todo handle fail")

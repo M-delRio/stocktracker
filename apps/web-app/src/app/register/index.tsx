@@ -29,7 +29,6 @@ const RegisterForm = () => {
       email: "",
     })
   }
-
   const onSubmitForm = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
 

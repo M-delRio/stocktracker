@@ -24,12 +24,6 @@ export class UsersService {
     user.lastName = createUserDto.lastName
     this.usersRepository.save(user)
 
-    // const user = new User()
-    // user.userName = createUserDto.userName
-    // user.firstName = createUserDto.firstName
-    // user.lastName = createUserDto.lastName
-    // this.usersRepository.save(user)
-
     return "User created!"
     // todo return hashed id?
   }

@@ -1,7 +1,7 @@
 import { Breakpoint } from "./breakpoint.interface"
 
 export interface Stock {
-  stockId: string
+  // stockId: string
   symbol: string
   nearestFloor: Breakpoint
   nearestCeiling: Breakpoint
