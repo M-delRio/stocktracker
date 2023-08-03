@@ -1,28 +1,48 @@
-import { useState, FormEvent } from "react"
+import { useState, useEffect } from "react"
 import { Stock } from "../../../../../libs/interfaces/stock.interface"
 
-import { addStock } from "../../../../../libs/data-access/http"
+import {
+  addStock,
+  getStockPrices,
+  getStocks,
+} from "../../../../../libs/data-access/http"
 
 interface Props {
   userId: string
 }
 
+const emptyNewStock = {
+  symbol: "",
+  nearestFloor: {
+    name: "",
+    value: undefined,
+  },
+  nearestCeiling: {
+    name: "",
+    value: undefined,
+  },
+}
+
 const UserLanding = ({ userId }: Props) => {
   const [stocks, setStocks] = useState<Stock[]>([])
 
-  const [newStock, setNewStock] = useState<Stock>({
-    symbol: "",
-    nearestFloor: {
-      name: "",
-      value: undefined,
-    },
-    nearestCeiling: {
-      name: "",
-      value: undefined,
-    },
-  })
+  useEffect(() => {
+    const handleGetStocks = async () => {
+      const userStocks = await getStocks()
 
-  const handleSetNewSymbol = (symbol: string): void => {
+      console.log(JSON.stringify(userStocks))
+
+      setStocks(userStocks)
+    }
+
+    handleGetStocks().catch((err) => {
+      console.log(err)
+    })
+  }, [userId])
+
+  const [newStock, setNewStock] = useState<Stock>(emptyNewStock)
+
+  const setNewSymbol = (symbol: string): void => {
     setNewStock({
       ...newStock,
       symbol,
@@ -30,7 +50,7 @@ const UserLanding = ({ userId }: Props) => {
   }
 
   // todo combine name and value as required dependents?
-  const handleSetNewFloorName = (floorName: string): void => {
+  const setNewFloorName = (floorName: string): void => {
     setNewStock({
       ...newStock,
       nearestFloor: {
@@ -40,7 +60,7 @@ const UserLanding = ({ userId }: Props) => {
     })
   }
 
-  const handleSetNewFloorValue = (floorValue: number): void => {
+  const setNewFloorValue = (floorValue: number): void => {
     setNewStock({
       ...newStock,
       nearestFloor: {
@@ -50,7 +70,7 @@ const UserLanding = ({ userId }: Props) => {
     })
   }
 
-  const handleSetNewCeilingValue = (ceilingValue: number): void => {
+  const setNewCeilingValue = (ceilingValue: number): void => {
     setNewStock({
       ...newStock,
       nearestCeiling: {
@@ -60,7 +80,7 @@ const UserLanding = ({ userId }: Props) => {
     })
   }
 
-  const handleSetNewCeilingName = (ceilingName: string): void => {
+  const setNewCeilingName = (ceilingName: string): void => {
     setNewStock({
       ...newStock,
       nearestCeiling: {
@@ -70,22 +90,15 @@ const UserLanding = ({ userId }: Props) => {
     })
   }
 
-  // const [newStockSymbol, setNewStockSymbol] = useState("")
-  // const [newStockFloor, setNewStockFloor] = useState({
-  //   name: "",
-  //   value: 0
-  // })
-  // const [newStockCeiling, setNewStockCeiling] = useState({
-  //   name: "",
-  //   value: 0
-  // })
+  const handleDeleteStock = async (symbol: string): Promise<void> => undefined
 
-  const handleAddStock = async (
-    e: FormEvent<HTMLFormElement>
-  ): Promise<void> => {
+  const handleEditStock = async (symbol: string): Promise<void> => undefined
+
+  const handleAddStock = async (): Promise<void> => {
     console.log(JSON.stringify(newStock))
 
     try {
+      // add to b/e
       await addStock({
         symbol: newStock.symbol,
         nearestFloor: {
@@ -97,13 +110,20 @@ const UserLanding = ({ userId }: Props) => {
           value: newStock.nearestCeiling.value as number,
         },
       })
+
+      // inject price to f/e
+      const stockPrices = await getStockPrices([newStock.symbol])
+
+      setStocks([
+        ...stocks,
+        { ...newStock, price: stockPrices[newStock.symbol] },
+      ])
+      // reset state for future new stock
+      setNewStock(emptyNewStock)
     } catch (err) {
       // todo let user know of success or fail
       console.log("todo handle fail")
     }
-
-    // todo send to b/e
-    // success? update state
 
     // if (newStockSymbol.trim() !== "") {
     //   const newStock: Stock = {
@@ -138,55 +158,81 @@ const UserLanding = ({ userId }: Props) => {
   return (
     <div>
       <h2>{userId}, Here's how things are looking for your stocks</h2>
-
-      <ul>
+      <table>
+        <tr>
+          <th>Symbol</th>
+          <th>Floor Name</th>
+          <th>Floor Value</th>
+          <th>Ceiling Name</th>
+          <th>Ceiling Value</th>
+          <th>Price</th>
+          <th>Actions</th>
+        </tr>
         {stocks.map((stock) => (
-          <li key={stock.symbol}>{stock.symbol}</li>
+          <tr key={stock.symbol}>
+            <td>{stock.symbol}</td>
+            <td>{stock.nearestFloor.name}</td>
+            <td>{stock.nearestFloor.value}</td>
+            <td>{stock.nearestCeiling.name}</td>
+            <td>{stock.nearestCeiling.value}</td>
+            <td>{stock.price}</td>
+            <td>
+              <button
+                key={`edit ${stock.symbol}`}
+                onClick={() => handleEditStock(stock.symbol)}
+              >
+                Edit
+              </button>
+              <button
+                key={`delete ${stock.symbol}`}
+                onClick={() => handleDeleteStock(stock.symbol)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
         ))}
-      </ul>
+      </table>
 
-      <div>
-        <h3>Add New Stock</h3>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleAddStock(e)
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Symbol"
-            value={newStock.symbol}
-            onChange={(e) => handleSetNewSymbol(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Floor Name"
-            value={newStock.nearestFloor.name}
-            onChange={(e) => handleSetNewFloorName(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Floor Value"
-            value={newStock.nearestFloor.value}
-            onChange={(e) => handleSetNewFloorValue(Number(e.target.value))}
-          />
-          <input
-            type="text"
-            placeholder="Ceiling Name"
-            value={newStock.nearestCeiling.name}
-            onChange={(e) => handleSetNewCeilingName(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Stock Ceiling Value"
-            value={newStock.nearestCeiling.value}
-            onChange={(e) => handleSetNewCeilingValue(Number(e.target.value))}
-          />
-          <button type="submit">Add Stock</button>
-        </form>
-      </div>
+      <h3>Add New Stock</h3>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleAddStock()
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Symbol"
+          value={newStock.symbol}
+          onChange={(e) => setNewSymbol(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Floor Name"
+          value={newStock.nearestFloor.name}
+          onChange={(e) => setNewFloorName(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Floor Value"
+          value={newStock.nearestFloor.value}
+          onChange={(e) => setNewFloorValue(Number(e.target.value))}
+        />
+        <input
+          type="text"
+          placeholder="Ceiling Name"
+          value={newStock.nearestCeiling.name}
+          onChange={(e) => setNewCeilingName(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Stock Ceiling Value"
+          value={newStock.nearestCeiling.value}
+          onChange={(e) => setNewCeilingValue(Number(e.target.value))}
+        />
+        <button type="submit">Add Stock</button>
+      </form>
     </div>
   )
 }

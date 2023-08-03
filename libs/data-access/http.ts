@@ -1,4 +1,6 @@
-import axios, { AxiosError } from "axios"
+import RegisterForm from "apps/web-app/src/app/register"
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
+import { Stock } from "libs/interfaces/stock.interface"
 
 type RegisterUserArgs = {
   userName: string
@@ -20,13 +22,107 @@ type AddStockArgs = {
   }
 }
 
+type StockPrice = { [key: string]: number }
+
+export type StockDataResponse = { symbol: string; ask: number }
+
 // todo extract to env var
 const PORT = 3000
 const serverEndpoint = `http://localhost:${PORT}/`
+const financeApiURL = "https://mboum-finance.p.rapidapi.com/qu/quote"
+
+export const getStockPrices = async (
+  stockSymbols: string[]
+): Promise<{ [key: string]: number }> => {
+  console.log(`symbols: ${stockSymbols.toString()}`)
+
+  const requestOptions = {
+    method: "GET",
+    url: financeApiURL,
+    params: {
+      symbol: stockSymbols.toString(),
+    },
+    headers: {
+      // todo extract to env var DON'T PUSH
+      "X-RapidAPI-Key": "",
+      "X-RapidAPI-Host": "",
+    },
+  }
+
+  let stockPrices: StockPrice = {}
+
+  try {
+    const priceResponse = await httpRequest<StockDataResponse[]>(requestOptions)
+
+    // change DS to {symbol: price}
+    for (const stockData of priceResponse) {
+      stockPrices[stockData.symbol] = stockData.ask
+    }
+
+    console.log(
+      `Success: retrieved stock prices: ${JSON.stringify(stockPrices)}`
+    )
+
+    return stockPrices
+  } catch (error: any | AxiosError) {
+    console.log("Failed to fetch stock price")
+    throw new Error("")
+  }
+}
+
+// make partial if id added back to Stock interface
+export const getStocks = async (): Promise<Stock[]> => {
+  let stockPrices: StockPrice
+  try {
+    const requestOptions = {
+      method: "GET",
+      url: serverEndpoint + "users/1/stocks",
+    }
+
+    let stocks = await httpRequest<Stock[]>(requestOptions)
+
+    console.log("Success: retrieved user's stocks")
+    // todo remove ids?
+
+    stocks = stocks.map((stock) => ({
+      symbol: stock.symbol,
+      nearestFloor: stock.nearestFloor,
+      nearestCeiling: stock.nearestCeiling,
+    }))
+
+    const stockSymbols = stocks.map((stock) => {
+      return stock.symbol
+    })
+
+    try {
+      stockPrices = await getStockPrices(stockSymbols)
+
+      stocks = stocks.map((stock) => ({
+        ...stock,
+        price: stockPrices[stock.symbol],
+      }))
+    } catch (err) {
+      // todo cache stock price on b/e w/redis
+      console.log(`unable to fetch prices for stocks: ${stockSymbols}`)
+    }
+
+    return stocks
+  } catch (error: any | AxiosError) {
+    console.log("Failed to fetch stocks")
+    throw new Error("")
+  }
+}
 
 export const registerUser = async (data: RegisterUserArgs) => {
   try {
-    await postRequest(serverEndpoint + "users/", data)
+    // await postRequest(serverEndpoint + "users/", data)
+    const requestOptions = {
+      method: "GET",
+      url: serverEndpoint + "users/",
+      data,
+    }
+
+    await httpRequest(requestOptions)
 
     console.log("Success: user registered in registerUser")
   } catch (error: any | AxiosError) {
@@ -37,7 +133,15 @@ export const registerUser = async (data: RegisterUserArgs) => {
 
 export const addStock = async (data: AddStockArgs) => {
   try {
-    await postRequest(serverEndpoint + "users/1/stocks", data)
+    // await postRequest(serverEndpoint + "users/1/stocks", data)
+
+    const requestOptions = {
+      method: "GET",
+      url: serverEndpoint + "users/1/stocks",
+      data,
+    }
+
+    await httpRequest(requestOptions)
 
     console.log("Success: stock added in userLanding")
   } catch (error: any | AxiosError) {
@@ -46,11 +150,15 @@ export const addStock = async (data: AddStockArgs) => {
   }
 }
 
-const postRequest = async <T>(endpoint: string, data: T): Promise<void> => {
+const httpRequest = async <T>(options: AxiosRequestConfig): Promise<T> => {
   try {
-    const response = await axios.post(endpoint, data)
+    // const response = await axios.get(endpoint, options)
+
+    const response = await axios.request(options)
 
     console.log(JSON.stringify(response))
+
+    return response.data
   } catch (error: any | AxiosError) {
     if (axios.isAxiosError(error)) {
       // Access to config, request, and response

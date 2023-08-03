@@ -34,7 +34,7 @@ export class StocksService {
   }
 
   findAll() {
-    return `This action returns all stocks`
+    return this.stocksRepository.find()
   }
 
   findOne(id: number) {
