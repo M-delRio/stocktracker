@@ -11,9 +11,9 @@ import { StocksService } from "./stocks.service"
 import { CreateStockDto } from "./dto/create-stock.dto"
 import { UpdateStockDto } from "./dto/update-stock.dto"
 
-@Controller("users/:userId/stocks")
+@Controller("users/:userName/stocks")
 export class StocksController {
-  constructor(private readonly stocksService: StocksService) { }
+  constructor(private readonly stocksService: StocksService) {}
 
   @Post()
   create(@Body() createStockDto: CreateStockDto) {
@@ -35,8 +35,8 @@ export class StocksController {
     return this.stocksService.update(+id, updateStockDto)
   }
 
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.stocksService.remove(+id)
+  @Delete(":symbol")
+  remove(@Param("symbol") symbol: string, @Param("userName") userName: string) {
+    return this.stocksService.remove(symbol, userName)
   }
 }

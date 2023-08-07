@@ -14,4 +14,7 @@ export class Stock {
 
   @Column()
   nearestFloor: Breakpoint
+
+  @Column()
+  userName: string
 }

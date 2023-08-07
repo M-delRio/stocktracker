@@ -4,6 +4,8 @@ export class CreateStockDto {
   nearestCeiling: Breakpoint
 
   nearestFloor: Breakpoint
+
+  userName: string
 }
 
 class Breakpoint {

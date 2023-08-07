@@ -1,6 +1,5 @@
 import { Body, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { ObjectId } from "mongodb"
 import { Repository } from "typeorm"
 import { CreateStockDto } from "./dto/create-stock.dto"
 import { UpdateStockDto } from "./dto/update-stock.dto"
@@ -27,6 +26,7 @@ export class StocksService {
       name: createStockDto.nearestCeiling.name,
       value: createStockDto.nearestCeiling.value,
     }
+    stock.userName = createStockDto.userName
 
     this.stocksRepository.save(stock)
 
@@ -45,7 +45,12 @@ export class StocksService {
     return `This action updates a #${id} stock`
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} stock`
+  remove(symbol, userName: string) {
+    console.log(`remove ${symbol} ${userName}`)
+
+    return this.stocksRepository.delete({
+      symbol,
+      userName,
+    })
   }
 }

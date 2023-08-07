@@ -48,7 +48,7 @@ export function App() {
           path="/fixedUser"
           element={
             <div>
-              <UserLanding userId="Joe Blow ID" />
+              <UserLanding userName="ah" />
               <Link to="/">Back Home.</Link>
             </div>
           }

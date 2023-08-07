@@ -5,25 +5,27 @@ import {
   addStock,
   getStockPrices,
   getStocks,
+  removeStock,
 } from "../../../../../libs/data-access/http"
 
 interface Props {
-  userId: string
+  userName: string
 }
 
 const emptyNewStock = {
   symbol: "",
   nearestFloor: {
     name: "",
-    value: undefined,
+    value: 0,
   },
   nearestCeiling: {
     name: "",
-    value: undefined,
+    value: 0,
   },
+  userName: "",
 }
 
-const UserLanding = ({ userId }: Props) => {
+const UserLanding = ({ userName }: Props) => {
   const [stocks, setStocks] = useState<Stock[]>([])
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const UserLanding = ({ userId }: Props) => {
     handleGetStocks().catch((err) => {
       console.log(err)
     })
-  }, [userId])
+  }, [userName])
 
   const [newStock, setNewStock] = useState<Stock>(emptyNewStock)
 
@@ -90,7 +92,16 @@ const UserLanding = ({ userId }: Props) => {
     })
   }
 
-  const handleDeleteStock = async (symbol: string): Promise<void> => undefined
+  const handleDeleteStock = async (symbol: string): Promise<void> => {
+    try {
+      await removeStock(symbol, userName)
+
+      setStocks(stocks.filter((stock) => stock.symbol !== symbol))
+    } catch (err) {
+      // todo let user know of success or fail
+      console.log("todo handle fail add stock")
+    }
+  }
 
   const handleEditStock = async (symbol: string): Promise<void> => undefined
 
@@ -100,16 +111,22 @@ const UserLanding = ({ userId }: Props) => {
     try {
       // add to b/e
       await addStock({
-        symbol: newStock.symbol,
-        nearestFloor: {
-          name: newStock.nearestFloor.name,
-          value: newStock.nearestFloor.value as number,
-        },
-        nearestCeiling: {
-          name: newStock.nearestCeiling.name,
-          value: newStock.nearestCeiling.value as number,
-        },
+        ...newStock,
+        userName,
       })
+
+      // await addStock({
+      //   symbol: newStock.symbol,
+      //   nearestFloor: {
+      //     name: newStock.nearestFloor.name,
+      //     value: newStock.nearestFloor.value as number,
+      //   },
+      //   nearestCeiling: {
+      //     name: newStock.nearestCeiling.name,
+      //     value: newStock.nearestCeiling.value as number,
+      //   },
+      //   userName,
+      // })
 
       // inject price to f/e
       const stockPrices = await getStockPrices([newStock.symbol])
@@ -122,7 +139,7 @@ const UserLanding = ({ userId }: Props) => {
       setNewStock(emptyNewStock)
     } catch (err) {
       // todo let user know of success or fail
-      console.log("todo handle fail")
+      console.log("todo handle fail add stock")
     }
 
     // if (newStockSymbol.trim() !== "") {
@@ -157,7 +174,7 @@ const UserLanding = ({ userId }: Props) => {
 
   return (
     <div>
-      <h2>{userId}, Here's how things are looking for your stocks</h2>
+      <h2>{userName}, Here's how things are looking for your stocks</h2>
       <table>
         <tr>
           <th>Symbol</th>
