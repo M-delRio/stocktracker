@@ -21,8 +21,8 @@ export class StocksController {
   }
 
   @Get()
-  findAll() {
-    return this.stocksService.findAll()
+  findAll(@Param("userName") userName: string) {
+    return this.stocksService.findAll(userName)
   }
 
   @Get(":id")

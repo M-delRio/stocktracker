@@ -72,12 +72,12 @@ export const getStockPrices = async (
 }
 
 // make partial if id added back to Stock interface
-export const getStocks = async (): Promise<Stock[]> => {
+export const getStocks = async (userName: string): Promise<Stock[]> => {
   let stockPrices: StockPrice
   try {
     const requestOptions = {
       method: "GET",
-      url: serverEndpoint + "users/1/stocks",
+      url: serverEndpoint + `users/${userName}/stocks`,
     }
 
     let stocks = await httpRequest<Stock[]>(requestOptions)

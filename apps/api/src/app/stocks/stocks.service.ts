@@ -33,8 +33,12 @@ export class StocksService {
     return "Stock Added!"
   }
 
-  findAll() {
-    return this.stocksRepository.find()
+  findAll(userName: string) {
+    return this.stocksRepository.find({
+      where: {
+        userName: userName,
+      },
+    })
   }
 
   findOne(id: number) {

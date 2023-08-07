@@ -30,7 +30,7 @@ const UserLanding = ({ userName }: Props) => {
 
   useEffect(() => {
     const handleGetStocks = async () => {
-      const userStocks = await getStocks()
+      const userStocks = await getStocks(userName)
 
       console.log(JSON.stringify(userStocks))
 
