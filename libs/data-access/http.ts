@@ -20,6 +20,7 @@ type AddStockArgs = {
     name: string
     value: number
   }
+  userName: string
 }
 
 type StockPrice = { [key: string]: number }
@@ -36,28 +37,28 @@ export const getStockPrices = async (
 ): Promise<{ [key: string]: number }> => {
   console.log(`symbols: ${stockSymbols.toString()}`)
 
-  const requestOptions = {
-    method: "GET",
-    url: financeApiURL,
-    params: {
-      symbol: stockSymbols.toString(),
-    },
-    headers: {
-      // todo extract to env var DON'T PUSH
-      "X-RapidAPI-Key": "",
-      "X-RapidAPI-Host": "",
-    },
-  }
+  // const requestOptions = {
+  //   method: "GET",
+  //   url: financeApiURL,
+  //   params: {
+  //     symbol: stockSymbols.toString(),
+  //   },
+  //   headers: {
+  //     // todo extract to env var DON'T PUSH
+  //     "X-RapidAPI-Key": "",
+  //     "X-RapidAPI-Host": "-finance.p.rapidapi.com",
+  //   },
+  // }
 
   let stockPrices: StockPrice = {}
 
   try {
-    const priceResponse = await httpRequest<StockDataResponse[]>(requestOptions)
+    //   const priceResponse = await httpRequest<StockDataResponse[]>(requestOptions)
 
-    // change DS to {symbol: price}
-    for (const stockData of priceResponse) {
-      stockPrices[stockData.symbol] = stockData.ask
-    }
+    //   // change DS to {symbol: price}
+    //   for (const stockData of priceResponse) {
+    //     stockPrices[stockData.symbol] = stockData.ask
+    //   }
 
     console.log(
       `Success: retrieved stock prices: ${JSON.stringify(stockPrices)}`
@@ -81,13 +82,13 @@ export const getStocks = async (): Promise<Stock[]> => {
 
     let stocks = await httpRequest<Stock[]>(requestOptions)
 
-    console.log("Success: retrieved user's stocks")
-    // todo remove ids?
+    console.log("Success: retrieved user's stocks:", stocks)
 
     stocks = stocks.map((stock) => ({
       symbol: stock.symbol,
       nearestFloor: stock.nearestFloor,
       nearestCeiling: stock.nearestCeiling,
+      userName: stock.userName,
     }))
 
     const stockSymbols = stocks.map((stock) => {
@@ -99,7 +100,8 @@ export const getStocks = async (): Promise<Stock[]> => {
 
       stocks = stocks.map((stock) => ({
         ...stock,
-        price: stockPrices[stock.symbol],
+        price: 10,
+        // price: stockPrices[stock.symbol],
       }))
     } catch (err) {
       // todo cache stock price on b/e w/redis
@@ -117,7 +119,7 @@ export const registerUser = async (data: RegisterUserArgs) => {
   try {
     // await postRequest(serverEndpoint + "users/", data)
     const requestOptions = {
-      method: "GET",
+      method: "POST",
       url: serverEndpoint + "users/",
       data,
     }
@@ -133,10 +135,8 @@ export const registerUser = async (data: RegisterUserArgs) => {
 
 export const addStock = async (data: AddStockArgs) => {
   try {
-    // await postRequest(serverEndpoint + "users/1/stocks", data)
-
     const requestOptions = {
-      method: "GET",
+      method: "POST",
       url: serverEndpoint + "users/1/stocks",
       data,
     }
@@ -147,6 +147,21 @@ export const addStock = async (data: AddStockArgs) => {
   } catch (error: any | AxiosError) {
     console.log("Failed to add stock")
     throw new Error("")
+  }
+}
+
+export const removeStock = async (stockSymbol: string, userName: string) => {
+  try {
+    const requestOptions = {
+      method: "DELETE",
+      url: serverEndpoint + `users/${userName}/stocks/${stockSymbol}`,
+    }
+
+    const response = await httpRequest(requestOptions)
+
+    console.log("Success: stock removed in userLanding", response)
+  } catch (error: any | AxiosError) {
+    console.log("Failed to remove stock")
   }
 }
 
