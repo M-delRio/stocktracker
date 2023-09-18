@@ -1,6 +1,7 @@
 import RegisterForm from "apps/web-app/src/app/register"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
 import { Stock } from "libs/interfaces/stock.interface"
+import { NewStock } from "libs/interfaces/new-stock.interface"
 
 type RegisterUserArgs = {
   userName: string
@@ -8,19 +9,6 @@ type RegisterUserArgs = {
   firstName: string
   lastName: string
   email: string
-}
-
-type AddStockArgs = {
-  symbol: string
-  nearestFloor: {
-    name: string
-    value: number
-  }
-  nearestCeiling: {
-    name: string
-    value: number
-  }
-  userName: string
 }
 
 type StockPrice = { [key: string]: number }
@@ -133,12 +121,15 @@ export const registerUser = async (data: RegisterUserArgs) => {
   }
 }
 
-export const addStock = async (data: AddStockArgs) => {
+export const addStock = async (newStock: NewStock, userName: string) => {
   try {
     const requestOptions = {
       method: "POST",
-      url: serverEndpoint + "users/1/stocks",
-      data,
+      url: serverEndpoint + "users/ah/stocks",
+      data: {
+        ...newStock,
+        userName,
+      },
     }
 
     await httpRequest(requestOptions)

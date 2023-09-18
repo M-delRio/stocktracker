@@ -1,9 +1,9 @@
 import { Breakpoint } from "./breakpoint.interface"
 
-export interface Stock {
+export type Stock = {
   symbol: string
   price?: number
-  nearestFloor: Breakpoint
-  nearestCeiling: Breakpoint
+  nearestFloor?: Breakpoint
+  nearestCeiling?: Breakpoint
   userName: string
 }

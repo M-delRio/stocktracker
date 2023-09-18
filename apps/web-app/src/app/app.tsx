@@ -6,6 +6,11 @@ import UserLanding from "./user-landing"
 
 import { Route, Routes, Link } from "react-router-dom"
 
+import AppBar from "@mui/material/AppBar"
+import Toolbar from "@mui/material/Toolbar"
+import Container from "@mui/material/Container"
+import Typography from "@mui/material/Typography"
+
 const StyledApp = styled.div`
   // Your style here
 `
@@ -13,17 +18,23 @@ const StyledApp = styled.div`
 export function App() {
   return (
     <StyledApp>
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/fixedUser">
-              Click here for a Sample User Landing Page.
+      <AppBar position="static">
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <Link to="/">
+              <Typography variant="h6" noWrap component="a" href="/">
+                STOCK-TRACKER
+              </Typography>
             </Link>
-          </li>
-        </ul>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      <div role="navigation">
+        <li>
+          <Link to="/fixedUser">
+            Click here for a Sample User Landing Page.
+          </Link>
+        </li>
       </div>
       <Routes>
         <Route
@@ -34,18 +45,19 @@ export function App() {
               <Link to="/register">New User? Register.</Link>
             </div>
           }
-        />
+        >
+          <Route
+            path="/register"
+            element={
+              <div>
+                <RegisterForm />
+                <Link to="/">Back Home.</Link>
+              </div>
+            }
+          />
+        </Route>
         <Route
-          path="/register"
-          element={
-            <div>
-              <RegisterForm />
-              <Link to="/">Back Home.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/fixedUser"
+          path="fixedUser"
           element={
             <div>
               <UserLanding userName="ah" />
@@ -54,7 +66,6 @@ export function App() {
           }
         />
       </Routes>
-      {/* END: routes */}
     </StyledApp>
   )
 }

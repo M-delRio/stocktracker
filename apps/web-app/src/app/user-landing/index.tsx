@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
+import { NewStock } from "../../../../../libs/interfaces/new-stock.interface"
 import { Stock } from "../../../../../libs/interfaces/stock.interface"
+import AddStockForm from "./add-stock-form"
 
 import {
   addStock,
@@ -10,19 +12,6 @@ import {
 
 interface Props {
   userName: string
-}
-
-const emptyNewStock = {
-  symbol: "",
-  nearestFloor: {
-    name: "",
-    value: 0,
-  },
-  nearestCeiling: {
-    name: "",
-    value: 0,
-  },
-  userName: "",
 }
 
 const UserLanding = ({ userName }: Props) => {
@@ -42,56 +31,6 @@ const UserLanding = ({ userName }: Props) => {
     })
   }, [userName])
 
-  const [newStock, setNewStock] = useState<Stock>(emptyNewStock)
-
-  const setNewSymbol = (symbol: string): void => {
-    setNewStock({
-      ...newStock,
-      symbol,
-    })
-  }
-
-  // todo combine name and value as required dependents?
-  const setNewFloorName = (floorName: string): void => {
-    setNewStock({
-      ...newStock,
-      nearestFloor: {
-        name: floorName,
-        value: newStock.nearestCeiling.value,
-      },
-    })
-  }
-
-  const setNewFloorValue = (floorValue: number): void => {
-    setNewStock({
-      ...newStock,
-      nearestFloor: {
-        name: newStock.nearestFloor.name,
-        value: floorValue,
-      },
-    })
-  }
-
-  const setNewCeilingValue = (ceilingValue: number): void => {
-    setNewStock({
-      ...newStock,
-      nearestCeiling: {
-        name: newStock.nearestCeiling.name,
-        value: ceilingValue,
-      },
-    })
-  }
-
-  const setNewCeilingName = (ceilingName: string): void => {
-    setNewStock({
-      ...newStock,
-      nearestCeiling: {
-        name: ceilingName,
-        value: newStock.nearestCeiling.value,
-      },
-    })
-  }
-
   const handleDeleteStock = async (symbol: string): Promise<void> => {
     try {
       await removeStock(symbol, userName)
@@ -105,15 +44,12 @@ const UserLanding = ({ userName }: Props) => {
 
   const handleEditStock = async (symbol: string): Promise<void> => undefined
 
-  const handleAddStock = async (): Promise<void> => {
+  const handleAddStock = async (newStock: NewStock): Promise<void> => {
     console.log(JSON.stringify(newStock))
 
     try {
       // add to b/e
-      await addStock({
-        ...newStock,
-        userName,
-      })
+      await addStock(newStock, userName)
 
       // await addStock({
       //   symbol: newStock.symbol,
@@ -125,7 +61,7 @@ const UserLanding = ({ userName }: Props) => {
       //     name: newStock.nearestCeiling.name,
       //     value: newStock.nearestCeiling.value as number,
       //   },
-      //   userName,
+      //   ,
       // })
 
       // inject price to f/e
@@ -133,10 +69,20 @@ const UserLanding = ({ userName }: Props) => {
 
       setStocks([
         ...stocks,
-        { ...newStock, price: stockPrices[newStock.symbol] },
+        {
+          symbol: newStock.symbol,
+          nearestFloor: {
+            name: newStock.nearestFloor.name,
+            value: +newStock.nearestFloor.value,
+          },
+          nearestCeiling: {
+            name: newStock.nearestCeiling.name,
+            value: +newStock.nearestCeiling.value,
+          },
+          userName: "",
+          price: stockPrices[newStock.symbol],
+        },
       ])
-      // reset state for future new stock
-      setNewStock(emptyNewStock)
     } catch (err) {
       // todo let user know of success or fail
       console.log("todo handle fail add stock")
@@ -188,10 +134,10 @@ const UserLanding = ({ userName }: Props) => {
         {stocks.map((stock) => (
           <tr key={stock.symbol}>
             <td>{stock.symbol}</td>
-            <td>{stock.nearestFloor.name}</td>
-            <td>{stock.nearestFloor.value}</td>
-            <td>{stock.nearestCeiling.name}</td>
-            <td>{stock.nearestCeiling.value}</td>
+            <td>{stock.nearestFloor?.name}</td>
+            <td>{stock.nearestFloor?.value}</td>
+            <td>{stock.nearestCeiling?.name}</td>
+            <td>{stock.nearestCeiling?.value}</td>
             <td>{stock.price}</td>
             <td>
               <button
@@ -210,46 +156,61 @@ const UserLanding = ({ userName }: Props) => {
           </tr>
         ))}
       </table>
+      <AddStockForm handleAddStock={handleAddStock} />
 
-      <h3>Add New Stock</h3>
-      <form
+      {/* <Box
         onSubmit={(e) => {
           e.preventDefault()
           handleAddStock()
         }}
-      >
-        <input
-          type="text"
-          placeholder="Symbol"
-          value={newStock.symbol}
-          onChange={(e) => setNewSymbol(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Floor Name"
-          value={newStock.nearestFloor.name}
-          onChange={(e) => setNewFloorName(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Floor Value"
-          value={newStock.nearestFloor.value}
-          onChange={(e) => setNewFloorValue(Number(e.target.value))}
-        />
-        <input
-          type="text"
-          placeholder="Ceiling Name"
-          value={newStock.nearestCeiling.name}
-          onChange={(e) => setNewCeilingName(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Stock Ceiling Value"
-          value={newStock.nearestCeiling.value}
-          onChange={(e) => setNewCeilingValue(Number(e.target.value))}
-        />
-        <button type="submit">Add Stock</button>
-      </form>
+        component="form"
+        sx={{
+          "& > :not(style)": { m: 1 },
+        }}
+        noValidate
+        autoComplete="off"
+      > */}
+
+      {/* </Box> */}
+      {/* <h3>Add New Stock</h3> */}
+      {/* <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleAddStock()
+        }}
+      > */}
+      {/* <input
+        type="text"
+        placeholder="Symbol"
+        value={newStock.symbol}
+        onChange={(e) => setNewSymbol(e.target.value)}
+      /> */}
+      {/* <input
+        type="text"
+        placeholder="Floor Name"
+        value={newStock.nearestFloor.name}
+        onChange={(e) => setNewFloorName(e.target.value)}
+      /> */}
+      {/* <input
+        type="number"
+        placeholder="Floor Value"
+        value={newStock.nearestFloor.value}
+        onChange={(e) => setNewFloorValue(Number(e.target.value))}
+      /> */}
+      {/* <input
+        type="text"
+        placeholder="Ceiling Name"
+        value={newStock.nearestCeiling.name}
+        onChange={(e) => setNewCeilingName(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Stock Ceiling Value"
+        value={newStock.nearestCeiling.value}
+        onChange={(e) => setNewCeilingValue(Number(e.target.value))}
+      />
+      <button type="submit">Add Stock</button> */}
+      {/* </form> */}
     </div>
   )
 }
