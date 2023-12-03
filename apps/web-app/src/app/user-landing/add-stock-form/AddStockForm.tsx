@@ -22,26 +22,43 @@ const emptyNewStock = {
 
 const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
   const [newStock, setNewStock] = useState<NewStock>(emptyNewStock)
-  //extract to custom hook
+
   const [isMissingFloorName, setIsMissingFloorName] = useState<boolean>(false)
   const [isMissingFloorValue, setIsMissingFloorValue] = useState<boolean>(false)
+  const [isMissingCeilingName, setIsMissingCeilingName] =
+    useState<boolean>(false)
+  const [isMissingCeilingValue, setIsMissingCeilingValue] =
+    useState<boolean>(false)
 
   const missingFloorName = (): boolean => {
     // todo check for positive number?
-    if (
-      newStock.nearestFloor.name === "" &&
-      typeof newStock.nearestFloor.value === "number"
-    ) {
+    if (newStock.nearestFloor.name === "" && !newStock.nearestFloor.value) {
       return true
     }
     return false
   }
 
   const missingFloorValue = (): boolean => {
-    if (
-      newStock.nearestFloor.name !== "" &&
-      typeof newStock.nearestFloor.value === "string"
-    ) {
+    if (newStock.nearestFloor.name !== "" && !newStock.nearestFloor.value) {
+      console.log("here")
+
+      return true
+    }
+    return false
+  }
+
+  const missingCeilingName = (): boolean => {
+    // todo check for positive number?
+    if (newStock.nearestCeiling.name === "" && !newStock.nearestCeiling.value) {
+      return true
+    }
+    return false
+  }
+
+  const missingCeilingValue = (): boolean => {
+    if (newStock.nearestCeiling.name !== "" && !newStock.nearestCeiling.value) {
+      console.log("here")
+
       return true
     }
     return false
@@ -65,7 +82,7 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
     })
   }
 
-  const setNewFloorValue = (floorValue: number): void => {
+  const setNewFloorValue = (floorValue: number | string): void => {
     setNewStock({
       ...newStock,
       nearestFloor: {
@@ -75,12 +92,12 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
     })
   }
 
-  const setNewCeilingValue = (ceilingValue: number): void => {
+  const setNewCeilingValue = (ceilingValue: number | string): void => {
     setNewStock({
       ...newStock,
       nearestCeiling: {
         name: newStock.nearestCeiling?.name,
-        value: ceilingValue || 0,
+        value: ceilingValue,
       },
     })
   }
@@ -90,7 +107,7 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
       ...newStock,
       nearestCeiling: {
         name: ceilingName,
-        value: newStock.nearestCeiling.value || 0,
+        value: newStock.nearestCeiling.value,
       },
     })
   }
@@ -108,6 +125,16 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
 
         if (missingFloorValue()) {
           setIsMissingFloorValue(true)
+          return
+        }
+
+        if (missingCeilingName()) {
+          setIsMissingCeilingName(true)
+          return
+        }
+
+        if (missingCeilingValue()) {
+          setIsMissingCeilingValue(true)
           return
         }
 
@@ -133,10 +160,10 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
       <TextField
         error={isMissingFloorValue}
         label="Floor Value"
-        placeholder="Floor Value"
+        type="number"
         variant="outlined"
         value={newStock.nearestFloor.value}
-        onChange={(e) => setNewFloorValue(+e.target.value)}
+        onChange={(e) => setNewFloorValue(e.target.value)}
       ></TextField>
       <TextField
         label="Ceiling Name"
@@ -146,9 +173,10 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
       ></TextField>
       <TextField
         label="Ceiling Value"
+        type="number"
         variant="outlined"
         value={newStock.nearestCeiling.value}
-        onChange={(e) => setNewCeilingValue(+e.target.value)}
+        onChange={(e) => setNewCeilingValue(e.target.value)}
       ></TextField>
       <button type="submit">Add Stock</button>
     </Grid>

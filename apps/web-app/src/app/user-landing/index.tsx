@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { createContext, useState, useEffect } from "react"
 import { NewStock } from "../../../../../libs/interfaces/new-stock.interface"
 import { Stock } from "../../../../../libs/interfaces/stock.interface"
 import AddStockForm from "./add-stock-form"
+import AppBarDrawer from "./app-bar-drawer"
 
 import {
   addStock,
@@ -9,13 +10,33 @@ import {
   getStocks,
   removeStock,
 } from "../../../../../libs/data-access/http"
+import StockTable from "./stock-table"
 
 interface Props {
   userName: string
 }
 
-const UserLanding = ({ userName }: Props) => {
+enum UserTabs {
+  stocks = "stocks",
+  addStock = "addStock",
+}
+
+type AllContextValue = {
+  userName: string
+  stocks: Stock[]
+  handleEditStock: (symbol: string) => void
+  handleDeleteStock: (symbol: string) => void
+  handleAddStock: (newStock: NewStock) => void
+  selectedTab: UserTabs
+  handleSetSelectedTab: (newSelectedTab: UserTabs) => void
+}
+
+// todo split this up
+const AllContext = createContext<AllContextValue | null>(null)
+
+const UserLanding = ({ userName }: Props): JSX.Element => {
   const [stocks, setStocks] = useState<Stock[]>([])
+  const [selectedTab, setSelectedTab] = useState<UserTabs>(UserTabs.stocks)
 
   useEffect(() => {
     const handleGetStocks = async () => {
@@ -42,7 +63,9 @@ const UserLanding = ({ userName }: Props) => {
     }
   }
 
-  const handleEditStock = async (symbol: string): Promise<void> => undefined
+  const handleEditStock = async (symbol: string): Promise<void> => {
+    console.log("in handleEditStock")
+  }
 
   const handleAddStock = async (newStock: NewStock): Promise<void> => {
     console.log(JSON.stringify(newStock))
@@ -87,132 +110,31 @@ const UserLanding = ({ userName }: Props) => {
       // todo let user know of success or fail
       console.log("todo handle fail add stock")
     }
+  }
 
-    // if (newStockSymbol.trim() !== "") {
-    //   const newStock: Stock = {
-    //     symbol: newStockSymbol.trim(),
-    //     nearestFloor: {
-    //       name: "",
-    //       value: 0,
-    //     },
-    //     nearestCeiling: {
-    //       name: "",
-    //       value: 0,
-    //     },
-    //   }
+  const handleSetSelectedTab = (newSelectedTab: UserTabs): void => {
+    setSelectedTab(newSelectedTab)
+  }
 
-    //   // setStocks((prevStocks) => [...prevStocks, newStock])
-
-    //   console.log()
-
-    //   // todo extract to clear func see other component
-    //   setNewStockSymbol("")
-    //   setNewStockFloor({
-    //     name: "",
-    //     value: 0,
-    //   })
-    //   setNewStockCeiling({
-    //     name: "",
-    //     value: 0,
-    //   })
-    // }
+  const AllContextValue = {
+    userName,
+    stocks,
+    handleEditStock,
+    handleDeleteStock,
+    handleAddStock,
+    selectedTab,
+    handleSetSelectedTab,
   }
 
   return (
     <div>
-      <h2>{userName}, Here's how things are looking for your stocks</h2>
-      <table>
-        <tr>
-          <th>Symbol</th>
-          <th>Floor Name</th>
-          <th>Floor Value</th>
-          <th>Ceiling Name</th>
-          <th>Ceiling Value</th>
-          <th>Price</th>
-          <th>Actions</th>
-        </tr>
-        {stocks.map((stock) => (
-          <tr key={stock.symbol}>
-            <td>{stock.symbol}</td>
-            <td>{stock.nearestFloor?.name}</td>
-            <td>{stock.nearestFloor?.value}</td>
-            <td>{stock.nearestCeiling?.name}</td>
-            <td>{stock.nearestCeiling?.value}</td>
-            <td>{stock.price}</td>
-            <td>
-              <button
-                key={`edit ${stock.symbol}`}
-                onClick={() => handleEditStock(stock.symbol)}
-              >
-                Edit
-              </button>
-              <button
-                key={`delete ${stock.symbol}`}
-                onClick={() => handleDeleteStock(stock.symbol)}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        ))}
-      </table>
-      <AddStockForm handleAddStock={handleAddStock} />
-
-      {/* <Box
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleAddStock()
-        }}
-        component="form"
-        sx={{
-          "& > :not(style)": { m: 1 },
-        }}
-        noValidate
-        autoComplete="off"
-      > */}
-
-      {/* </Box> */}
-      {/* <h3>Add New Stock</h3> */}
-      {/* <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleAddStock()
-        }}
-      > */}
-      {/* <input
-        type="text"
-        placeholder="Symbol"
-        value={newStock.symbol}
-        onChange={(e) => setNewSymbol(e.target.value)}
-      /> */}
-      {/* <input
-        type="text"
-        placeholder="Floor Name"
-        value={newStock.nearestFloor.name}
-        onChange={(e) => setNewFloorName(e.target.value)}
-      /> */}
-      {/* <input
-        type="number"
-        placeholder="Floor Value"
-        value={newStock.nearestFloor.value}
-        onChange={(e) => setNewFloorValue(Number(e.target.value))}
-      /> */}
-      {/* <input
-        type="text"
-        placeholder="Ceiling Name"
-        value={newStock.nearestCeiling.name}
-        onChange={(e) => setNewCeilingName(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Stock Ceiling Value"
-        value={newStock.nearestCeiling.value}
-        onChange={(e) => setNewCeilingValue(Number(e.target.value))}
-      />
-      <button type="submit">Add Stock</button> */}
-      {/* </form> */}
+      <AllContext.Provider value={AllContextValue}>
+        <AppBarDrawer />
+        {/* <StockTable userName={userName} stocks={stocks} handleEditStock={handleEditStock} handleDeleteStock={handleDeleteStock} />
+      <AddStockForm handleAddStock={handleAddStock} /> */}
+      </AllContext.Provider>
     </div>
   )
 }
 
-export default UserLanding
+export { AllContext, UserLanding }
