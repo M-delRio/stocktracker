@@ -4,7 +4,7 @@ import {
   StyledLogo,
   StyledHeaderToolBar,
   StyledUserContainer,
-} from "./TopHeader.styles"
+} from "./TopAppBar.styles"
 
 interface Props {
   userName: string
@@ -18,7 +18,7 @@ const getUserInitials = (userName: string): string => {
   return initials
 }
 
-const UpperNav = ({ userName }: Props) => {
+const TopAppBar = ({ userName }: Props) => {
   const userInitials = getUserInitials(userName)
 
   return (
@@ -33,4 +33,4 @@ const UpperNav = ({ userName }: Props) => {
   )
 }
 
-export default UpperNav
+export default TopAppBar

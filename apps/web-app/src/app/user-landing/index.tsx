@@ -1,8 +1,10 @@
 import React, { createContext, useState, useEffect } from "react"
 import { NewStock } from "../../../../../libs/interfaces/new-stock.interface"
 import { Stock } from "../../../../../libs/interfaces/stock.interface"
+import TopAppBar from "./top-app-bar"
 import AddStockForm from "./add-stock-form"
 import AppBarDrawer from "./app-bar-drawer"
+import { Box } from "@mui/material"
 
 import {
   addStock,
@@ -127,14 +129,35 @@ const UserLanding = ({ userName }: Props): JSX.Element => {
   }
 
   return (
-    <div>
+    <>
+      <TopAppBar userName="Joe" />
       <AllContext.Provider value={AllContextValue}>
-        <AppBarDrawer />
-        {/* <StockTable userName={userName} stocks={stocks} handleEditStock={handleEditStock} handleDeleteStock={handleDeleteStock} />
-      <AddStockForm handleAddStock={handleAddStock} /> */}
+        <Box
+          sx={{
+            display: "flex",
+            "MuiBox-root": {
+              display: "flex",
+            },
+            marginTop: "10%",
+          }}
+        >
+          <AppBarDrawer handleSetSelectedTab={handleSetSelectedTab} />
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+            {selectedTab === UserTabs.stocks ? (
+              <StockTable
+                userName={userName}
+                stocks={stocks}
+                handleEditStock={handleEditStock}
+                handleDeleteStock={handleDeleteStock}
+              />
+            ) : (
+              <AddStockForm handleAddStock={handleAddStock} />
+            )}
+          </Box>
+        </Box>
       </AllContext.Provider>
-    </div>
+    </>
   )
 }
 
-export { AllContext, UserLanding }
+export { AllContext, UserLanding, UserTabs }
