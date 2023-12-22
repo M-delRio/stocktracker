@@ -1,8 +1,11 @@
 import React, { useState } from "react"
 import { NewStock } from "../../../../../../libs/interfaces/new-stock.interface"
+import { StyledMainContentContainer } from "../stock-table/styles"
+import { StyledSubmit } from "./AddStockForm.styles"
 import TextField from "@mui/material/TextField"
-
-import { Grid } from "@mui/material"
+import Button from "@mui/material/Button"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
 
 type AddStockFormTypes = {
   handleAddStock: (newStock: NewStock) => void
@@ -113,7 +116,18 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
   }
 
   return (
+    // <StyledMainContentContainer>
     <Grid
+      sx={{
+        minWidth: 100,
+        maxWidth: 300,
+        paddingTop: "0.5rem",
+        paddingLeft: "2%",
+      }}
+      container={true}
+      direction="column"
+      columns={1}
+      rowSpacing={2}
       component="form"
       onSubmit={(e) => {
         e.preventDefault()
@@ -142,44 +156,84 @@ const AddStockForm = ({ handleAddStock }: AddStockFormTypes) => {
         setNewStock(emptyNewStock)
       }}
     >
-      <h3>Add New Stock</h3>
-      <TextField
-        required
-        label="Symbol"
-        variant="outlined"
-        value={newStock.symbol}
-        onChange={(e) => setNewSymbol(e.target.value)}
-      ></TextField>
-      <TextField
-        error={isMissingFloorName}
-        label="Floor Name"
-        variant="outlined"
-        value={newStock.nearestFloor.name}
-        onChange={(e) => setNewFloorName(e.target.value)}
-      ></TextField>
-      <TextField
-        error={isMissingFloorValue}
-        label="Floor Value"
-        type="number"
-        variant="outlined"
-        value={newStock.nearestFloor.value}
-        onChange={(e) => setNewFloorValue(e.target.value)}
-      ></TextField>
-      <TextField
-        label="Ceiling Name"
-        variant="outlined"
-        value={newStock.nearestCeiling.name}
-        onChange={(e) => setNewCeilingName(e.target.value)}
-      ></TextField>
-      <TextField
-        label="Ceiling Value"
-        type="number"
-        variant="outlined"
-        value={newStock.nearestCeiling.value}
-        onChange={(e) => setNewCeilingValue(e.target.value)}
-      ></TextField>
-      <button type="submit">Add Stock</button>
+      <Grid item={true}>
+        <Typography align="left" variant="h5">
+          Add New Stock
+        </Typography>
+      </Grid>
+      <Grid item={true}>
+        <TextField
+          fullWidth={true}
+          color="primary"
+          required
+          label="Symbol"
+          size="small"
+          variant="outlined"
+          value={newStock.symbol}
+          onChange={(e) => setNewSymbol(e.target.value)}
+        ></TextField>
+      </Grid>
+      <Grid item={true}>
+        <TextField
+          fullWidth={true}
+          color="primary"
+          error={isMissingFloorName}
+          label="Floor Name"
+          size="small"
+          variant="outlined"
+          value={newStock.nearestFloor.name}
+          onChange={(e) => setNewFloorName(e.target.value)}
+        ></TextField>
+      </Grid>
+
+      <Grid item={true}>
+        <TextField
+          fullWidth={true}
+          error={isMissingFloorValue}
+          label="Floor Value"
+          type="number"
+          size="small"
+          variant="outlined"
+          value={newStock.nearestFloor.value}
+          onChange={(e) => setNewFloorValue(e.target.value)}
+        ></TextField>
+      </Grid>
+
+      <Grid item={true}>
+        <TextField
+          fullWidth={true}
+          label="Ceiling Name"
+          variant="outlined"
+          size="small"
+          value={newStock.nearestCeiling.name}
+          onChange={(e) => setNewCeilingName(e.target.value)}
+        ></TextField>
+      </Grid>
+
+      <Grid item={true}>
+        <TextField
+          fullWidth={true}
+          label="Ceiling Value"
+          type="number"
+          variant="outlined"
+          size="small"
+          value={newStock.nearestCeiling.value}
+          onChange={(e) => setNewCeilingValue(e.target.value)}
+        ></TextField>
+      </Grid>
+
+      <Grid
+        sx={{
+          alignSelf: "flex-end",
+        }}
+        item={true}
+      >
+        <StyledSubmit color="primary" type="submit" variant="outlined">
+          Add Stock
+        </StyledSubmit>
+      </Grid>
     </Grid>
+    // </StyledMainContentContainer>
   )
 }
 

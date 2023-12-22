@@ -1,20 +1,19 @@
 import { styled } from "@mui/material/styles"
 import Grid from "@mui/material/Grid"
-import { TableRow } from "@mui/material"
-import TableCell from "@mui/material/TableCell"
 
-const StyledStocksContainer = styled(Grid)(({ theme }) => ({
+const StyledMainContentContainer = styled(Grid)(({ theme }) => ({
   // border: "solid 1px blue",
   backgroundColor: theme.palette.grey[100],
   borderRadius: 4,
   // backgroudColor: theme.palette.primary.main,
-  marginTop: "3.5rem",
   padding: "0.5rem",
   gap: "1.5rem",
 }))
 
 const StyledStock = styled(Grid)(({ theme }) => ({
   // border: `solid 1px ${theme.palette.primary.main}`,
+  width: 220,
+  justifyContent: "space-between",
   margin: 0,
   paddingBottom: "0.5rem",
   paddingRight: "0.5rem",
@@ -58,4 +57,4 @@ const StyledPriceContainer = styled("div")(
   })
 )
 
-export { StyledStock, StyledStocksContainer, StyledPriceContainer }
+export { StyledStock, StyledMainContentContainer, StyledPriceContainer }

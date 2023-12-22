@@ -138,22 +138,22 @@ const UserLanding = ({ userName }: Props): JSX.Element => {
             "MuiBox-root": {
               display: "flex",
             },
-            marginTop: "10%",
+            marginTop: "3rem",
           }}
         >
           <AppBarDrawer handleSetSelectedTab={handleSetSelectedTab} />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-            {selectedTab === UserTabs.stocks ? (
-              <StockTable
-                userName={userName}
-                stocks={stocks}
-                handleEditStock={handleEditStock}
-                handleDeleteStock={handleDeleteStock}
-              />
-            ) : (
-              <AddStockForm handleAddStock={handleAddStock} />
-            )}
-          </Box>
+          {/* <Box component="main" sx={{ flexGrow: 1, p: 3 }}> */}
+          {selectedTab === UserTabs.stocks ? (
+            <StockTable
+              userName={userName}
+              stocks={stocks}
+              handleEditStock={handleEditStock}
+              handleDeleteStock={handleDeleteStock}
+            />
+          ) : (
+            <AddStockForm handleAddStock={handleAddStock} />
+          )}
+          {/* </Box> */}
         </Box>
       </AllContext.Provider>
     </>

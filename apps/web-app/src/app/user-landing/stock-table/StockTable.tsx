@@ -9,7 +9,7 @@ import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
 import {
   StyledStock,
-  StyledStocksContainer,
+  StyledMainContentContainer,
   StyledPriceContainer,
 } from "./styles"
 import { Stock } from "../../../../../../libs/interfaces/stock.interface"
@@ -29,7 +29,7 @@ const StockTable = ({
 }: StockTableProps): JSX.Element => {
   return (
     <div>
-      <StyledStocksContainer container direction="row">
+      <StyledMainContentContainer container direction="row">
         {stocks?.map((stock) => (
           <StyledStock container direction="row" xs="auto" spacing={3}>
             <Grid container item direction={"column"} xs="auto" spacing={1}>
@@ -84,7 +84,7 @@ const StockTable = ({
             </Grid>
           </StyledStock>
         ))}
-      </StyledStocksContainer>
+      </StyledMainContentContainer>
       {/* <table>
         {stocks.map((stock) => (
           <tr key={stock.symbol}>

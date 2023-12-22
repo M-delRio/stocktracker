@@ -54,10 +54,10 @@ export function App() {
           path="fixedUser"
           element={
             <div>
-              <AppBarDrawer />
+              {/* <AppBarDrawer /> */}
               {/* <TopHeader userName="ah" /> */}
               <UserLanding userName="ah" />
-              <Link to="/">Sign out</Link>
+              {/* <Link to="/">Sign out</Link> */}
             </div>
           }
         />
